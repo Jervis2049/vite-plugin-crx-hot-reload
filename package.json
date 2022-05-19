@@ -1,0 +1,19 @@
+{
+  "name": "vite-plugin-crx-hot-reload",
+  "version": "1.0.0",
+  "description": "A vite plugin to help Chrome extend hot updates.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rollup --config rollup.config.js --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jervis2049/vite-plugin-crx-hot-reload.git"
+  },
+  "author": "Jervis",
+  "license": "ISC",
+  "devDependencies": {
+    "rollup": "^2.73.0",
+    "websocket": "^1.0.34"
+  }
+}
