@@ -34,8 +34,6 @@ export default function crxHotReloadPlugin(options = {}) {
     return basename(background) === fileName
   }
 
-  console.log('2')
-
   return {
     name: 'vite-plugin-crx-hot-reload',
     apply: 'build',
@@ -52,8 +50,6 @@ export default function crxHotReloadPlugin(options = {}) {
       return data + code
     },
     buildEnd: () => {
-      console.log('564--dd-----')
-
       if (socketConnection) {
         socketConnection.sendUTF({
           message: 'UPDATE',
