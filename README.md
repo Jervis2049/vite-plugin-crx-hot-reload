@@ -37,17 +37,17 @@ Establish a Socket Connection. Send a message to the Chrome extension client to 
 
 - **Type:** `Object`
 
-The background and content_scripts path must be an absolute path.
+During the tranform hook phase, code to update the app is inserted into the background.js and content scripts.
 
 **Example:**
 
 ```js
 viteCrxHotReload({
   watch: {
-    background: path.resolve(__dirname, '../', './src/js/background.js'),
+    background: './src/js/background.js',
     content_scripts: [
-      path.resolve(__dirname, '../', './src/js/content_scripts/content1.js'),
-      path.resolve(__dirname, '../', './src/js/content_scripts/content2.js'),
+      './src/js/content_scripts/content.js',
+      './src/js/content_scripts/gitlab.js',
     ],
   },
 })
