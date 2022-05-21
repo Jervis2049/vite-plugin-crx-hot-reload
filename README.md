@@ -1,3 +1,7 @@
+## Diagram
+
+![process.png](docs/process.png)
+
 ## Install
 
 ```bash
