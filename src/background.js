@@ -1,7 +1,0 @@
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.msg == 'RELOAD') {
-    chrome.runtime.reload()
-    chrome.tabs.reload()
-    sendResponse()
-  }
-})

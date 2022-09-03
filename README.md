@@ -5,13 +5,13 @@
 ## Install
 
 ```bash
-npm i vite-plugin-crx-hot-reload -D
+npm install vite-plugin-crx-hot-reload -D
 
 # yarn
 yarn add vite-plugin-crx-hot-reload -D
 
 # pnpm
-pnpm add vite-plugin-crx-hot-reload -D
+pnpm install vite-plugin-crx-hot-reload -D
 ```
 
 ## Usage
@@ -20,7 +20,7 @@ pnpm add vite-plugin-crx-hot-reload -D
 import viteCrxHotReload from 'vite-plugin-crx-hot-reload'
 
 export default {
-  plugins: [viteCrxHotReload(/* plugin options */)],
+  plugins: [viteCrxHotReload(/* plugin options */)]
 }
 ```
 
@@ -47,9 +47,9 @@ viteCrxHotReload({
     background: './src/js/background.js',
     content_scripts: [
       './src/js/content_scripts/content.js',
-      './src/js/content_scripts/gitlab.js',
-    ],
-  },
+      './src/js/content_scripts/gitlab.js'
+    ]
+  }
 })
 ```
 
@@ -65,6 +65,6 @@ A callback method for the completion of the first packaged build, in which you c
 viteCrxHotReload({
   buildEnd() {
     //do something
-  },
+  }
 })
 ```
