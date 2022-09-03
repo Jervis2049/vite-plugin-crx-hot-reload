@@ -1,19 +1,46 @@
 {
   "name": "vite-plugin-crx-hot-reload",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "A vite plugin to help Chrome extend hot updates.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rollup --config rollup.config.js --watch"
+    "dev": "pnpm run build --watch",
+    "build": "tsup src/*.ts",
+    "example:dev": "nodemon --config nodemon.json",
+    "prepare": "husky install",
+    "format": "prettier --write --cache .",
+    "lint-staged": "lint-staged",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Jervis2049/vite-plugin-crx-hot-reload.git"
-  },
+  "keywords": [
+    "vite",
+    "plugin"
+  ],
   "author": "Jervis",
-  "license": "ISC",
-  "devDependencies": {
-    "rollup": "^2.73.0",
+  "license": "MIT",
+  "dependencies": {
     "websocket": "^1.0.34"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.8",
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
+    "eslint": "^8.22.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "nodemon": "^2.0.19",
+    "prettier": "^2.7.1",
+    "tsup": "^6.2.2",
+    "typescript": "^4.7.4",
+    "vite": "^3.0.9"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix"
+    ]
   }
 }
