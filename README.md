@@ -46,8 +46,8 @@ viteCrxHotReload({
   watch: {
     background: './src/js/background.js',
     content_scripts: [
-      './src/js/content_scripts/content.js',
-      './src/js/content_scripts/gitlab.js'
+      './src/js/content_scripts/content1.js',
+      './src/js/content_scripts/content2.js'
     ]
   }
 })
