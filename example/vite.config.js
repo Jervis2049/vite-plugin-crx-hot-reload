@@ -67,8 +67,7 @@ export default defineConfig({
         background: './src/js/background.js',
         content1: './src/js/content_scripts/content1.js',
         content2: './src/js/content_scripts/content2.js',
-        popup: './popup.html',
-        m: './manifest.json'
+        popup: './popup.html'
       },
       output: {
         entryFileNames: `js/[name].js`,
