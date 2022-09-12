@@ -1,0 +1,21 @@
+{
+  "name": "vue-vite-chrome-extension-template",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "vite build --mode production"
+  },
+  "dependencies": {
+    "vue": "^3.2.25"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.0",
+    "chokidar": "^3.5.3",
+    "fs-extra": "^10.0.1",
+    "less": "^4.1.2",
+    "sass-resources-loader": "^2.2.5",
+    "vite": "link:../node_modules/vite",
+    "vite-plugin-crx-hot-reload": "link:../../"
+  },
+  "license": "ISC"
+}
