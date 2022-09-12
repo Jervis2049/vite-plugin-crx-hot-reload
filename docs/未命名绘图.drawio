@@ -1,1 +1,43 @@
-<mxfile host="app.diagrams.net" modified="2022-09-12T07:56:04.411Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36" version="20.3.0" etag="Xl3bYbDngvfAPCQK-e-z" type="github"><diagram id="_M_fOaLHztckxdP3wiTB">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2022-09-12T08:31:16.300Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36" etag="WaricPPvsGhyFstUEJt4" version="20.3.0" type="github">
+  <diagram id="_M_fOaLHztckxdP3wiTB" name="第 1 页">
+    <mxGraphModel dx="1278" dy="547" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="QyMh-5r2N0dAt28rJuuR-1" value="files change" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="193" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QyMh-5r2N0dAt28rJuuR-2" value="pnpm run dev&lt;br&gt;(vite build --watch)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="280" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QyMh-5r2N0dAt28rJuuR-4" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="130" y="300" as="sourcePoint" />
+            <mxPoint x="160" y="299.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QyMh-5r2N0dAt28rJuuR-6" value="start websocket&lt;br&gt;service" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="280" width="90" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QyMh-5r2N0dAt28rJuuR-7" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="QyMh-5r2N0dAt28rJuuR-6">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="271" y="299.91" as="sourcePoint" />
+            <mxPoint x="280" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QyMh-5r2N0dAt28rJuuR-10" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="140" width="160" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="QyMh-5r2N0dAt28rJuuR-13" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="132" y="207.41" as="sourcePoint" />
+            <mxPoint x="280" y="206" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QyMh-5r2N0dAt28rJuuR-15" value="buildStart hook&lt;br&gt;(Insert code for reload in background.js and content_scripts.)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="150" width="140" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
