@@ -1,26 +1,20 @@
-## Diagram
+## Workflow
 
-![process.png](docs/process.png)
+![workflow.png](docs/workflow.png)
 
 ## Install
 
 ```bash
-npm install vite-plugin-crx-hot-reload -D
-
-# yarn
-yarn add vite-plugin-crx-hot-reload -D
-
-# pnpm
 pnpm install vite-plugin-crx-hot-reload -D
 ```
 
 ## Usage
 
 ```js
-import viteCrxHotReload from 'vite-plugin-crx-hot-reload'
+import crxHotReload from 'vite-plugin-crx-hot-reload'
 
 export default {
-  plugins: [viteCrxHotReload(/* plugin options */)]
+  plugins: [crxHotReload(/* plugin options */)]
 }
 ```
 
@@ -33,38 +27,22 @@ export default {
 
 Establish a Socket Connection. Send a message to the Chrome extension client to update when a file changes.
 
-### watch
+### input
 
-- **Type:** `Object`
+- **Type:** `string`
+- **Required :** `true`
 
-During the tranform hook phase, code to update the app is inserted into the background.js and content scripts.
-
-**Example:**
-
-```js
-viteCrxHotReload({
-  watch: {
-    background: './src/js/background.js',
-    content_scripts: [
-      './src/js/content_scripts/content1.js',
-      './src/js/content_scripts/content2.js'
-    ]
-  }
-})
-```
-
-### buildEnd
-
-- **Type:** `Function`
-
-A callback method for the completion of the first packaged build, in which you can do things like copy and move files.
+Manifest file for Chrome extension.
 
 **Example:**
 
 ```js
-viteCrxHotReload({
-  buildEnd() {
-    //do something
-  }
+crxHotReload({
+  input: './src/manifest.json'
 })
 ```
+
+## Notes
++ Build.emptyOutDir needs to set `false` in vite configuration file.
++ After starting the project, if you find that the page does not refresh automatically after modifying content_scripts, you may need to refresh the page manually first.
+

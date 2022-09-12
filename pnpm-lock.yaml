@@ -4,6 +4,7 @@ specifiers:
   '@types/node': ^18.7.8
   '@typescript-eslint/eslint-plugin': ^5.33.1
   '@typescript-eslint/parser': ^5.33.1
+  chalk: 4.1.2
   eslint: ^8.22.0
   eslint-config-prettier: ^8.5.0
   eslint-plugin-node: ^11.1.0
@@ -12,12 +13,14 @@ specifiers:
   lint-staged: ^13.0.3
   nodemon: ^2.0.19
   prettier: ^2.7.1
+  rollup: ^2.79.0
   tsup: ^6.2.2
   typescript: ^4.7.4
   vite: ^3.0.9
   websocket: ^1.0.34
 
 dependencies:
+  chalk: 4.1.2
   websocket: 1.0.34
 
 devDependencies:
@@ -32,6 +35,7 @@ devDependencies:
   lint-staged: 13.0.3
   nodemon: 2.0.19
   prettier: 2.7.1
+  rollup: 2.79.0
   tsup: 6.2.2_typescript@4.7.4
   typescript: 4.7.4
   vite: 3.0.9
@@ -304,7 +308,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       color-convert: 2.0.1
-    dev: true
 
   /ansi-styles/6.1.0:
     resolution: {integrity: sha512-VbqNsoz55SYGczauuup0MFUyXNQviSpFTj1RQtFzmQLk18qbVSpTFFGMT293rmDaQuKCT6InmbuEyUne4mTuxQ==}
@@ -394,7 +397,6 @@ packages:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
-    dev: true
 
   /chokidar/3.5.3:
     resolution: {integrity: sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==}
@@ -444,11 +446,9 @@ packages:
     engines: {node: '>=7.0.0'}
     dependencies:
       color-name: 1.1.4
-    dev: true
 
   /color-name/1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
-    dev: true
 
   /colorette/2.0.19:
     resolution: {integrity: sha512-3tlv/dIP7FWvj3BsbHrGLJ6l/oKh1O3TcgBqMn+yyCagOxc23fyzDS6HypQbgxWbkpDnf52p1LuR4eWDQ/K9WQ==}
@@ -1378,7 +1378,6 @@ packages:
   /has-flag/4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
-    dev: true
 
   /has/1.0.3:
     resolution: {integrity: sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==}
@@ -1969,6 +1968,14 @@ packages:
       fsevents: 2.3.2
     dev: true
 
+  /rollup/2.79.0:
+    resolution: {integrity: sha512-x4KsrCgwQ7ZJPcFA/SUu6QVcYlO7uRLfLAy0DSA4NS2eG8japdbpM50ToH7z4iObodRYOJ0soneF0iaQRJ6zhA==}
+    engines: {node: '>=10.0.0'}
+    hasBin: true
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
+
   /run-parallel/1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
     dependencies:
@@ -2147,7 +2154,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       has-flag: 4.0.0
-    dev: true
 
   /supports-preserve-symlinks-flag/1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
@@ -2238,7 +2244,7 @@ packages:
       joycon: 3.1.1
       postcss-load-config: 3.1.4
       resolve-from: 5.0.0
-      rollup: 2.77.3
+      rollup: 2.79.0
       source-map: 0.8.0-beta.0
       sucrase: 3.25.0
       tree-kill: 1.2.2

@@ -1,1 +1,1 @@
-console.log('https://www.google.com')
+console.log('test')

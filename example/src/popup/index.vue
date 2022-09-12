@@ -1,5 +1,7 @@
 <template>
-  <div @click="log" class="container">{{ msg }}</div>
+  <div>
+    <div @click="log" class="container">{{ msg }}</div>
+  </div>
 </template>
 
 <script setup>

@@ -1,31 +1,52 @@
-import type { Plugin } from 'vite'
-import type { Options } from './types'
+import type { Plugin, ResolvedConfig } from 'vite'
+import type { ChromeExtensionManifest, ContentScript } from './manifest'
 import http from 'http'
 import websocket from 'websocket'
-import { basename, resolve } from 'path'
+import { resolve, dirname, join } from 'path'
 import { readFileSync } from 'fs'
+import { isJsonString } from './utils'
 
-const initOptions = {
-  watch: {
-    background: '',
-    content_scripts: []
-  }
+interface Options {
+  port?: number
+  input: string
 }
 
-export default function crxHotReloadPlugin(
-  options: Options = initOptions
-): Plugin {
-  const { buildEnd, watch, port = 8181 } = options
-  const { background, content_scripts } = watch
+export default function crxHotReloadPlugin(options: Options): Plugin {
+  const { port = 8181, input = '' } = options
+  if (
+    !input ||
+    typeof input != 'string' ||
+    (typeof input == 'string' && !input.endsWith('manifest.json'))
+  ) {
+    throw new Error(
+      "The input parameter is required and the value must be the path to the chrome extension's manifest.json."
+    )
+  }
 
   let socketConnection: any
-  let init = true
+  let backgroundJs: string | undefined
+  let contentJs: string[] = []
+  let iconsPath: any[] = []
+  let manifestFilePath: string | undefined
+  const srcDir = dirname(input)
+  let manifestAssets: string[] = []
 
-  const isContentJs = (fileName: string) => {
-    return content_scripts.find((item) => basename(item) === fileName)
-  }
-  const isBackgroundJs = (fileName: string) => {
-    return basename(background) === fileName
+  function handleScripts(path, originBuffer) {
+    const initBuffer = Buffer.from(`var PORT=${port};`)
+    let injectCodeBuffer
+    const isBackgroundJs = path === backgroundJs
+    const isContentJs = contentJs.includes(path)
+    if (isBackgroundJs || isContentJs) {
+      if (isBackgroundJs) {
+        injectCodeBuffer = readFileSync(resolve(__dirname, './background.js'))
+      }
+      if (isContentJs) {
+        injectCodeBuffer = readFileSync(resolve(__dirname, './content.js'))
+      }
+      return Buffer.concat([initBuffer, injectCodeBuffer, originBuffer])
+    } else {
+      return originBuffer
+    }
   }
 
   return {
@@ -51,28 +72,63 @@ export default function crxHotReloadPlugin(
         })
       })
     },
-    transform(code, id) {
-      const fileName = basename(id)
-      let data = ''
-      if (isBackgroundJs(fileName)) {
-        data = `var PORT=${port};`
-        data += readFileSync(resolve(__dirname, './background.js'), 'utf-8')
+    configResolved(config: ResolvedConfig) {
+      const rootPath = config.root
+      manifestFilePath = resolve(rootPath, input)
+      const manifestRaw: string = readFileSync(manifestFilePath, 'utf-8')
+      if (!isJsonString(manifestRaw)) {
+        throw new Error('The manifest.json is not valid.')
       }
-      if (isContentJs(fileName)) {
-        data = `var PORT=${port};`
-        data += readFileSync(resolve(__dirname, './content.js'), 'utf-8')
+      const manifestContent: ChromeExtensionManifest = JSON.parse(manifestRaw)
+      backgroundJs = manifestContent?.background?.service_worker
+      if (backgroundJs) manifestAssets.push(backgroundJs)
+      if (manifestContent.icons) {
+        const icons = Object.keys(manifestContent.icons)
+        if (Array.isArray(icons)) {
+          iconsPath = icons.map((key) => {
+            return manifestContent.icons?.[key]
+          })
+          manifestAssets = [...manifestAssets, ...iconsPath]
+        }
       }
-      return data + code
+      if (manifestContent.content_scripts) {
+        manifestContent.content_scripts.forEach((item: ContentScript) => {
+          if (item.js) {
+            manifestAssets = [...manifestAssets, ...item.js]
+            contentJs = [...contentJs, ...item.js]
+          }
+        })
+      }
+    },
+    buildStart() {
+      manifestAssets.forEach((path) => {
+        const assetPath = join(srcDir, path)
+        this.addWatchFile(assetPath)
+        let content = readFileSync(assetPath)
+        //inject code
+        content = handleScripts(path, content)
+        //generate files
+        this.emitFile({
+          type: 'asset',
+          source: content,
+          fileName: path
+        })
+      })
+      if (manifestFilePath) {
+        this.addWatchFile(manifestFilePath)
+        const manifestContent = readFileSync(manifestFilePath)
+        this.emitFile({
+          type: 'asset',
+          source: manifestContent,
+          fileName: 'manifest.json'
+        })
+      }
     },
     writeBundle() {
       if (socketConnection) {
         socketConnection.sendUTF({
           message: 'UPDATE'
         })
-      }
-      if (init && typeof buildEnd == 'function') {
-        buildEnd()
-        init = false
       }
     }
   }
