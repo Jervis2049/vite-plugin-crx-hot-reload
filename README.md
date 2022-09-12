@@ -44,5 +44,5 @@ crxHotReload({
 
 ## Notes
 + Build.emptyOutDir needs to set `false` in vite configuration file.
-+ After starting the project, if you find that the page does not refresh automatically after modifying content_scripts, you may need to refresh the page manually first.
++ After starting the project, if the page does not refresh automatically after modifying content_scripts, you may need to refresh the page manually first.
 
