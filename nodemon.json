@@ -1,4 +1,3 @@
 {
-  "watch": ["./dist", "./example/manifest.json", "./example/vite.config.js"],
-  "exec": "cd example && pnpm run dev"
+  "watch": ["./dist", "./examples/**/manifest.json"]
 }

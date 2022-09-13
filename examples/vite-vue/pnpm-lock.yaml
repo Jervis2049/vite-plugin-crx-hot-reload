@@ -6,21 +6,21 @@ specifiers:
   fs-extra: ^10.0.1
   less: ^4.1.2
   sass-resources-loader: ^2.2.5
-  vite: link:../node_modules/vite
-  vite-plugin-crx-hot-reload: link:../
+  vite: link:../../node_modules/vite
+  vite-plugin-crx-hot-reload: link:../../
   vue: ^3.2.25
 
 dependencies:
   vue: 3.2.38
 
 devDependencies:
-  '@vitejs/plugin-vue': 2.3.4_rhhfkopoe3dra5ibbq3vvjxzwu
+  '@vitejs/plugin-vue': 2.3.4_hnscmsan2tamnwimqz4fa5lgmq
   chokidar: 3.5.3
   fs-extra: 10.1.0
   less: 4.1.3
   sass-resources-loader: 2.2.5
-  vite: link:../node_modules/vite
-  vite-plugin-crx-hot-reload: link:..
+  vite: link:../../node_modules/vite
+  vite-plugin-crx-hot-reload: link:../..
 
 packages:
 
@@ -47,14 +47,14 @@ packages:
       '@babel/helper-validator-identifier': 7.18.6
       to-fast-properties: 2.0.0
 
-  /@vitejs/plugin-vue/2.3.4_rhhfkopoe3dra5ibbq3vvjxzwu:
+  /@vitejs/plugin-vue/2.3.4_hnscmsan2tamnwimqz4fa5lgmq:
     resolution: {integrity: sha512-IfFNbtkbIm36O9KB8QodlwwYvTEsJb4Lll4c2IwB3VHc2gie2mSPtSzL0eYay7X2jd/2WX02FjSGTWR6OPr/zg==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       vite: ^2.5.10
       vue: ^3.2.25
     dependencies:
-      vite: link:..\node_modules\vite
+      vite: link:..\..\node_modules\vite
       vue: 3.2.38
     dev: true
 

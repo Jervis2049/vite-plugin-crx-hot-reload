@@ -30,49 +30,60 @@ export default function crxHotReloadPlugin(options: Options): Plugin {
   let manifestFilePath: string | undefined
   const srcDir = dirname(input)
   let manifestAssets: string[] = []
+  let globalConfig: ResolvedConfig
+
+  function isProduction() {
+    return (
+      globalConfig?.mode == 'production' || process.env.NODE_ENV == 'production'
+    )
+  }
 
   function handleScripts(path, originBuffer) {
-    const initBuffer = Buffer.from(`var PORT=${port};`)
-    let injectCodeBuffer
-    const isBackgroundJs = path === backgroundJs
-    const isContentJs = contentJs.includes(path)
-    if (isBackgroundJs || isContentJs) {
-      if (isBackgroundJs) {
-        injectCodeBuffer = readFileSync(resolve(__dirname, './background.js'))
-      }
-      if (isContentJs) {
-        injectCodeBuffer = readFileSync(resolve(__dirname, './content.js'))
-      }
-      return Buffer.concat([initBuffer, injectCodeBuffer, originBuffer])
-    } else {
+    if (isProduction()) {
       return originBuffer
+    } else {
+      const initBuffer = Buffer.from(`var PORT=${port};`)
+      let injectCodeBuffer
+      const isBackgroundJs = path === backgroundJs
+      const isContentJs = contentJs.includes(path)
+      if (isBackgroundJs || isContentJs) {
+        if (isBackgroundJs) {
+          injectCodeBuffer = readFileSync(resolve(__dirname, './background.js'))
+        }
+        if (isContentJs) {
+          injectCodeBuffer = readFileSync(resolve(__dirname, './content.js'))
+        }
+        return Buffer.concat([initBuffer, injectCodeBuffer, originBuffer])
+      } else {
+        return originBuffer
+      }
     }
+  }
+
+  function startWebsocket() {
+    if (isProduction()) return
+    const server = http.createServer()
+    server.listen(port)
+    const WebSocketServer = websocket.server
+    const wsServer = new WebSocketServer({
+      httpServer: server
+    })
+    wsServer.on('connect', (connection) => {
+      console.log('start ws server at port', connection.socket.localPort)
+    })
+    wsServer.on('request', (request) => {
+      socketConnection = request.accept(null, request.origin)
+      socketConnection.on('close', () => {
+        console.log('Client has disconnected.')
+      })
+    })
   }
 
   return {
     name: 'vite-plugin-crx-hot-reload',
     enforce: 'pre',
-    apply(config) {
-      return !!config.build?.watch || config.mode == 'development'
-    },
-    config() {
-      const server = http.createServer()
-      server.listen(port)
-      const WebSocketServer = websocket.server
-      const wsServer = new WebSocketServer({
-        httpServer: server
-      })
-      wsServer.on('connect', (connection) => {
-        console.log('start ws server at port', connection.socket.localPort)
-      })
-      wsServer.on('request', (request) => {
-        socketConnection = request.accept(null, request.origin)
-        socketConnection.on('close', () => {
-          console.log('Client has disconnected.')
-        })
-      })
-    },
     configResolved(config: ResolvedConfig) {
+      globalConfig = config
       const rootPath = config.root
       manifestFilePath = resolve(rootPath, input)
       const manifestRaw: string = readFileSync(manifestFilePath, 'utf-8')
@@ -99,6 +110,7 @@ export default function crxHotReloadPlugin(options: Options): Plugin {
           }
         })
       }
+      startWebsocket()
     },
     buildStart() {
       manifestAssets.forEach((path) => {

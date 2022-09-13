@@ -1,6 +1,8 @@
+
+## 
 ## Workflow
 
-![workflow.png](docs/workflow.png)
+![workflow.png](https://raw.githubusercontent.com/Jervis2049/vite-plugin-crx-hot-reload/main/docs/workflow.png)
 
 ## Install
 
