@@ -7,40 +7,44 @@ const pathResolve = (p) => {
   return resolve(__dirname, p)
 }
 
-export default defineConfig({
-  plugins: [
-    vue(),
-    crxHotReload({
-      input: './src/manifest.json'
-    })
-  ],
-  resolve: {
-    alias: {
-      '@': pathResolve('./src')
-    }
-  },
-  build: {
-    emptyOutDir: false,
-    rollupOptions: {
-      input: {
-        popup: './popup.html'
+export default ({ mode }) => {  
+  return defineConfig({
+      plugins: [
+        vue(),
+        crxHotReload({
+          input: './src/manifest.json'
+        })
+      ],
+      resolve: {
+        alias: {
+          '@': pathResolve('./src')
+        }
       },
-      output: {
-        entryFileNames: `js/[name].js`
+      build: {
+        emptyOutDir: mode == 'production',
+        rollupOptions: {
+          input: {
+            popup: './popup.html'
+          },
+          output: {
+            entryFileNames: `js/[name].js`
+          }
+        }
+      },
+      css: {
+        modules: false,
+        preprocessorOptions: {
+          less: {
+            modifyVars: {
+              hack: `true; @import (reference) "${pathResolve(
+                './src/assets/less/variables.less'
+              )}";`
+            },
+            javascriptEnabled: true
+          }
+        }
       }
-    }
-  },
-  css: {
-    modules: false,
-    preprocessorOptions: {
-      less: {
-        modifyVars: {
-          hack: `true; @import (reference) "${pathResolve(
-            './src/assets/less/variables.less'
-          )}";`
-        },
-        javascriptEnabled: true
-      }
-    }
-  }
-})
+    })
+}
+
+ 

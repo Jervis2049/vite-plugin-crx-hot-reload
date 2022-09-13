@@ -45,6 +45,6 @@ crxHotReload({
 ```
 
 ## Notes
-+ Build.emptyOutDir needs to set `false` in vite configuration file.
++ When in a development environment, `build.emptyOutDir` needs to be set to `false` in the vite configuration file.
 + After starting the project, if the page does not refresh automatically after modifying content_scripts, you may need to refresh the page manually first.
 
