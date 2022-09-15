@@ -1,5 +1,5 @@
 {
-  "name": "vite-react",
+  "name": "react-vite-chrome-extension-template",
   "private": true,
   "version": "0.0.1",
   "scripts": {
@@ -15,6 +15,6 @@
     "@types/react-dom": "^17.0.10",
     "@vitejs/plugin-react": "^1.0.7",
     "vite": "^3.0.9",
-    "vite-plugin-crx-hot-reload": "link:../../"
+    "vite-plugin-crx-hot-reload": "1.0.2"
   }
 }
