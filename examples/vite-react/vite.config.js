@@ -1,6 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import crxHotReload from 'vite-plugin-crx-hot-reload'
+import { resolve } from 'path'
+
+const pathResolve = (p) => {
+  return resolve(__dirname, p)
+}
 
 export default ({mode})=>{
   return defineConfig({
@@ -14,6 +19,11 @@ export default ({mode})=>{
           entryFileNames: `js/[name].js`
         }
       }
+    },
+    resolve: {
+        alias: {
+          '@': pathResolve('./src')
+        }
     },
     plugins: [
       react(), 

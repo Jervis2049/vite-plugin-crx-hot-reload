@@ -23,9 +23,7 @@ export default ({ mode }) => {
       build: {
         emptyOutDir: mode == 'production',
         rollupOptions: {
-          input: {
-            popup: './popup.html'
-          },
+          input: ['./popup.html','./options.html'],
           output: {
             entryFileNames: `js/[name].js`
           }

@@ -11,7 +11,9 @@ interface Options {
   input: string
 }
 
-export default function crxHotReloadPlugin(options: Options): Plugin {
+export default function crxHotReloadPlugin(
+  options: Partial<Options> = {}
+): Plugin {
   const { port = 8181, input = '' } = options
   if (
     !input ||
@@ -84,8 +86,7 @@ export default function crxHotReloadPlugin(options: Options): Plugin {
     enforce: 'pre',
     configResolved(config: ResolvedConfig) {
       globalConfig = config
-      const rootPath = config.root
-      manifestFilePath = resolve(rootPath, input)
+      manifestFilePath = resolve(config.root, input)
       const manifestRaw: string = readFileSync(manifestFilePath, 'utf-8')
       if (!isJsonString(manifestRaw)) {
         throw new Error('The manifest.json is not valid.')

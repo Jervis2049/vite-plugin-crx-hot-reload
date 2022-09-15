@@ -1,15 +1,11 @@
 <template>
-  <div>
-    <div @click="log" class="container">{{ msg }}</div>
+  <div class="container">
+    <a :href="optionsPageUrl" target="_blank">Open the options page</a>
   </div>
 </template>
 
 <script setup>
-const msg = 'Hello World!'
-
-function log() {
-  console.log(msg)
-}
+const optionsPageUrl = `chrome-extension://${chrome.runtime.id}/options.html`
 </script>
 
 <style lang="less" scoped>
