@@ -7,6 +7,7 @@ const pathResolve = (p) => {
   return resolve(__dirname, p)
 }
 
+
 export default ({ mode }) => {  
   return defineConfig({
       plugins: [
@@ -23,11 +24,8 @@ export default ({ mode }) => {
       build: {
         emptyOutDir: mode == 'production',
         rollupOptions: {
-          input: ['./popup.html','./options.html'],
-          output: {
-            entryFileNames: `js/[name].js`
-          }
-        }
+          input: ['./popup.html', './options.html', './src/js/content_scripts/content3.js'],
+        },  
       },
       css: {
         modules: false,

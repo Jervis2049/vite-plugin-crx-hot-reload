@@ -42,7 +42,6 @@
   },
   "lint-staged": {
     "*.{ts,js}": [
-      "eslint --fix"
     ]
   },
   "files": ["dist","README.md","docs"]

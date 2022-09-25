@@ -1,3 +1,4 @@
 {
-  "watch": ["./dist", "./examples/**/manifest.json"]
+  "watch": ["./dist"],
+  "exec": "cd examples/vite-vue && pnpm run dev"
 }

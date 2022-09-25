@@ -1,8 +1,10 @@
 export function isJsonString(str) {
   try {
-    if (typeof JSON.parse(str) == 'object') {
-      return true
-    }
+    return typeof JSON.parse(str) == 'object'
   } catch (e) {}
   return false
+}
+
+export function normalizePath(path) {
+  return path.replace(/\\/g, '/')
 }

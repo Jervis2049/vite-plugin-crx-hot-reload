@@ -1,11 +1,10 @@
 <template>
   <div class="container">
-    <a :href="optionsPageUrl" target="_blank">Open the options page</a>
+    Hello world！
   </div>
 </template>
 
 <script setup>
-const optionsPageUrl = `chrome-extension://${chrome.runtime.id}/options.html`
 </script>
 
 <style lang="less" scoped>
