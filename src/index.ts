@@ -1,7 +1,11 @@
 import type { Plugin, ResolvedConfig } from 'vite'
-import type { ChromeExtensionManifest, ContentScript } from './manifest'
+import type {
+  ChromeExtensionManifest,
+  ContentScript,
+  Background
+} from './manifest'
 import { WebSocketServer } from 'ws'
-import { resolve, dirname, basename, join } from 'path'
+import { resolve, dirname, extname, basename, normalize } from 'path'
 import { readFileSync } from 'fs'
 import { isJsonString, normalizePath } from './utils'
 
@@ -32,6 +36,57 @@ export default function crxHotReloadPlugin(
   let manifestFullPath: string | undefined
   let iconAssets: string[] = []
   let changedFilePath: string
+  let manifestRaw: string
+
+  function handleManifest(config) {
+    let rollupOptionsInput = config.build.rollupOptions.input
+    manifestFullPath = resolve(config.root, input)
+    manifestRaw = readFileSync(manifestFullPath, 'utf-8')
+    if (!isJsonString(manifestRaw)) {
+      throw new Error('The manifest.json is not valid.')
+    }
+    let manifestContent: ChromeExtensionManifest = JSON.parse(manifestRaw)
+    let serviceWorker = manifestContent?.background?.service_worker
+    if (serviceWorker) {
+      backgroundScript = normalizePath(resolve(srcDir, serviceWorker))
+      scriptPaths.push(backgroundScript)
+    }
+    if (manifestContent.icons) {
+      const icons = Object.keys(manifestContent.icons)
+      if (Array.isArray(icons)) {
+        let iconsPath = icons.map((key) => {
+          return manifestContent.icons?.[key]
+        })
+        iconAssets = [...iconAssets, ...iconsPath]
+      }
+    }
+    if (Array.isArray(manifestContent.content_scripts)) {
+      manifestContent.content_scripts.forEach((item: ContentScript) => {
+        if (Array.isArray(item.js)) {
+          let contentScriptFullPaths = item.js.map((path) =>
+            normalizePath(resolve(srcDir, path))
+          )
+          scriptPaths = [...scriptPaths, ...contentScriptFullPaths]
+          contentScripts = [...contentScripts, ...contentScriptFullPaths]
+        }
+      })
+    }
+
+    // Add background.js and content_scripts as part of rollupOptions.input
+    if (Array.isArray(rollupOptionsInput)) {
+      config.build.rollupOptions.input = [...rollupOptionsInput, ...scriptPaths]
+    } else if (typeof rollupOptionsInput === 'object') {
+      const entryRet = {}
+      scriptPaths.forEach((item) => {
+        const name = basename(item, extname(item))
+        entryRet[name] = item
+      })
+      config.build.rollupOptions.input = {
+        ...rollupOptionsInput,
+        ...entryRet
+      }
+    }
+  }
 
   function handleBuildPath(config) {
     if (!config.build.rollupOptions.output) {
@@ -41,7 +96,7 @@ export default function crxHotReloadPlugin(
     config.build.rollupOptions.output.entryFileNames = (assetInfo) => {
       if (
         assetInfo.facadeModuleId &&
-        assetInfo.facadeModuleId.endsWith('.js')
+        /.(j|t)s$/.test(assetInfo.facadeModuleId)
       ) {
         let srcFullPath = resolve(srcDir)
         const assetPath = dirname(assetInfo.facadeModuleId).replace(
@@ -79,56 +134,8 @@ export default function crxHotReloadPlugin(
     name: 'vite-plugin-crx-hot-reload',
     enforce: 'pre',
     configResolved(config: ResolvedConfig) {
-      let rollupOptionsInput = config.build.rollupOptions.input
-      manifestFullPath = resolve(config.root, input)
-      const manifestRaw: string = readFileSync(manifestFullPath, 'utf-8')
-      if (!isJsonString(manifestRaw)) {
-        throw new Error('The manifest.json is not valid.')
-      }
-      const manifestContent: ChromeExtensionManifest = JSON.parse(manifestRaw)
-      let serviceWorker = manifestContent?.background?.service_worker
-      if (serviceWorker) {
-        backgroundScript = normalizePath(resolve(srcDir, serviceWorker))
-        scriptPaths.push(normalizePath(backgroundScript))
-      }
-      if (manifestContent.icons) {
-        const icons = Object.keys(manifestContent.icons)
-        if (Array.isArray(icons)) {
-          let iconsPath = icons.map((key) => {
-            return manifestContent.icons?.[key]
-          })
-          iconAssets = [...iconAssets, ...iconsPath]
-        }
-      }
-      if (Array.isArray(manifestContent.content_scripts)) {
-        manifestContent.content_scripts.forEach((item: ContentScript) => {
-          if (Array.isArray(item.js)) {
-            let contentScriptFullPaths = item.js.map((path) =>
-              normalizePath(resolve(srcDir, path))
-            )
-            scriptPaths = [...scriptPaths, ...contentScriptFullPaths]
-            contentScripts = [...contentScripts, ...contentScriptFullPaths]
-          }
-        })
-      }
-
-      // Add background.js and content_scripts as part of rollupOptions.input
-      if (Array.isArray(rollupOptionsInput)) {
-        config.build.rollupOptions.input = [
-          ...rollupOptionsInput,
-          ...scriptPaths
-        ]
-      } else if (typeof rollupOptionsInput === 'object') {
-        const entryRet = {}
-        scriptPaths.forEach((item) => {
-          const name = basename(item, '.js')
-          entryRet[name] = join(srcDir, item)
-        })
-        config.build.rollupOptions.input = {
-          ...rollupOptionsInput,
-          ...entryRet
-        }
-      }
+      //Parse manifest.json
+      handleManifest(config)
 
       //Rewrite output.entryFileNames to modify build path of assets.
       handleBuildPath(config)
@@ -151,23 +158,24 @@ export default function crxHotReloadPlugin(
       return data + code
     },
     buildStart() {
+      //generate icon files
       iconAssets.forEach((path) => {
         const assetPath = resolve(srcDir, path)
         this.addWatchFile(assetPath)
         let content = readFileSync(assetPath)
-        //generate icon files
         this.emitFile({
           type: 'asset',
           source: content,
-          fileName: path
+          fileName: normalize(path)
         })
       })
+      //generate manifest.json
       if (manifestFullPath) {
         this.addWatchFile(manifestFullPath)
-        const manifestContent = readFileSync(manifestFullPath)
+        let manifestSource = manifestRaw.replaceAll('.ts', '.js')
         this.emitFile({
           type: 'asset',
-          source: manifestContent,
+          source: manifestSource,
           fileName: 'manifest.json'
         })
       }

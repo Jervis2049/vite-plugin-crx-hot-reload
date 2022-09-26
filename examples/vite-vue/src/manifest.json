@@ -17,17 +17,17 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "service_worker": "js/background.js"
+    "service_worker": "js/background.ts"
   },
   "content_scripts": [
     {
       "matches": ["*://*.npmjs.com/*"],
-      "js": ["js/content_scripts/content1.js"],
+      "js": ["js/content_scripts/content1.ts"],
       "run_at": "document_start"
     },
     {
       "matches": ["*://*.google.com/*"],
-      "js": ["js/content_scripts/content2.js"],
+      "js": ["js/content_scripts/content2.ts"],
       "run_at": "document_start"
     }
   ],

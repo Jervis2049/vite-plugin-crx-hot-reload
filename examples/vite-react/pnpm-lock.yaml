@@ -6,6 +6,7 @@ specifiers:
   '@vitejs/plugin-react': ^1.0.7
   react: ^17.0.2
   react-dom: ^17.0.2
+  typescript: ^4.5.4
   vite: ^3.0.9
   vite-plugin-crx-hot-reload: link:../../
 
@@ -17,6 +18,7 @@ devDependencies:
   '@types/react': 17.0.45
   '@types/react-dom': 17.0.17
   '@vitejs/plugin-react': 1.3.2
+  typescript: 4.8.3
   vite: 3.1.1
   vite-plugin-crx-hot-reload: link:../..
 
@@ -858,6 +860,12 @@ packages:
   /to-fast-properties/2.0.0:
     resolution: {integrity: sha1-3F5pjL0HkmW8c+A3doGk5Og/YW4=}
     engines: {node: '>=4'}
+    dev: true
+
+  /typescript/4.8.3:
+    resolution: {integrity: sha512-goMHfm00nWPa8UvR/CPSvykqf6dVV8x/dp0c5mFTMTIu0u0FlGWRioyy7Nn0PGAdHxpJZnuO/ut+PpQ8UiHAig==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
     dev: true
 
   /vite/3.1.1:

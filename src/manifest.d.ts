@@ -356,7 +356,7 @@ export interface Background {
   /**
    * Specify the service worker of the background page.
    */
-  service_worker: string
+  service_worker: string | undefined
 }
 export interface ChromeSettingsOverrides {
   homepage?: Icon

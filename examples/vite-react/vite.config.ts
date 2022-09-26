@@ -15,9 +15,6 @@ export default ({mode})=>{
         input: {
           popup: './popup.html'
         },
-        output: {
-          entryFileNames: `js/[name].js`
-        }
       }
     },
     resolve: {
