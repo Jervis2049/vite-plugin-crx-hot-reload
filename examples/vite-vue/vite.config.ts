@@ -33,7 +33,7 @@ export default ({ mode }) => {
           less: {
             modifyVars: {
               hack: `true; @import (reference) "${pathResolve(
-                './src/assets/less/variables.less'
+                './src/popup/assets/less/variables.less'
               )}";`
             },
             javascriptEnabled: true

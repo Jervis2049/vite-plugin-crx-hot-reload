@@ -5,7 +5,7 @@ ws.onopen = function () {
 }
 ws.onmessage = function (e) {
   console.log('Received Message: ' + e.data)
-  if (chrome.runtime?.id) {
+  if (e.data === 'UPDATE_CONTENT' && chrome.runtime?.id) {
     chrome.runtime.sendMessage({ msg: 'RELOAD' }, () => {
       window.location.reload()
     })

@@ -1,9 +1,5 @@
 import type { Plugin, ResolvedConfig } from 'vite'
-import type {
-  ChromeExtensionManifest,
-  ContentScript,
-  Background
-} from './manifest'
+import type { ChromeExtensionManifest, ContentScript } from './manifest'
 import { WebSocketServer } from 'ws'
 import { resolve, dirname, extname, basename, normalize } from 'path'
 import { readFileSync } from 'fs'
@@ -34,7 +30,7 @@ export default function crxHotReloadPlugin(
   let backgroundScript: string | undefined
   let contentScripts: string[] = []
   let manifestFullPath: string | undefined
-  let iconAssets: string[] = []
+  let assetPaths: string[] = []
   let changedFilePath: string
   let manifestRaw: string
 
@@ -54,10 +50,10 @@ export default function crxHotReloadPlugin(
     if (manifestContent.icons) {
       const icons = Object.keys(manifestContent.icons)
       if (Array.isArray(icons)) {
-        let iconsPath = icons.map((key) => {
+        let iconPaths = icons.map((key) => {
           return manifestContent.icons?.[key]
         })
-        iconAssets = [...iconAssets, ...iconsPath]
+        assetPaths = [...assetPaths, ...iconPaths]
       }
     }
     if (Array.isArray(manifestContent.content_scripts)) {
@@ -68,6 +64,9 @@ export default function crxHotReloadPlugin(
           )
           scriptPaths = [...scriptPaths, ...contentScriptFullPaths]
           contentScripts = [...contentScripts, ...contentScriptFullPaths]
+        }
+        if (Array.isArray(item.css)) {
+          assetPaths = [...assetPaths, ...item.css]
         }
       })
     }
@@ -149,7 +148,8 @@ export default function crxHotReloadPlugin(
     transform(code, id) {
       let data = ''
       if (backgroundScript === id) {
-        data = readFileSync(resolve(__dirname, './background.js'), 'utf-8')
+        data = `var PORT=${port};`
+        data += readFileSync(resolve(__dirname, './background.js'), 'utf-8')
       }
       if (contentScripts.includes(id)) {
         data = `var PORT=${port};`
@@ -158,8 +158,8 @@ export default function crxHotReloadPlugin(
       return data + code
     },
     buildStart() {
-      //generate icon files
-      iconAssets.forEach((path) => {
+      //generate icon/css files
+      assetPaths.forEach((path) => {
         const assetPath = resolve(srcDir, path)
         this.addWatchFile(assetPath)
         let content = readFileSync(assetPath)
@@ -181,8 +181,13 @@ export default function crxHotReloadPlugin(
       }
     },
     writeBundle() {
-      if (socket && contentScripts.includes(changedFilePath)) {
-        socket.send('UPDATE')
+      if (socket) {
+        if (contentScripts.includes(changedFilePath)) {
+          socket.send('UPDATE_CONTENT')
+        }
+        if (backgroundScript === changedFilePath) {
+          socket.send('UPDATE_SERVICE_WORK')
+        }
         console.log(`File change detected : ${changedFilePath}`)
       }
     }

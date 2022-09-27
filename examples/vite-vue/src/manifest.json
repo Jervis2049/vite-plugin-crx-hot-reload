@@ -23,6 +23,7 @@
     {
       "matches": ["*://*.npmjs.com/*"],
       "js": ["js/content_scripts/content1.ts"],
+      "css": ["css/test.css"],
       "run_at": "document_start"
     },
     {

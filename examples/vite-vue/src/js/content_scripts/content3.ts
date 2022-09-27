@@ -1,1 +1,1 @@
-console.log('content3')
+alert('content3')
