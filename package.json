@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-crx-hot-reload",
-  "version": "1.0.2",
+  "version": "1.0.3-beta.0",
   "description": "A vite plugin to help Chrome extend hot updates.",
   "main": "dist/index.js",
   "scripts": {
@@ -41,8 +41,11 @@
     "vite": "^3.0.9"
   },
   "lint-staged": {
-    "*.{ts,js}": [
-    ]
+    "*.{ts,js}": []
   },
-  "files": ["dist","README.md","docs"]
+  "files": [
+    "dist",
+    "README.md",
+    "docs"
+  ]
 }
