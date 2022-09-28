@@ -36,7 +36,7 @@ export default function crxHotReloadPlugin(
 
   function handleManifest(config) {
     let rollupOptionsInput = config.build.rollupOptions.input
-    manifestFullPath = resolve(config.root, input)
+    manifestFullPath = normalizePath(resolve(config.root, input))
     manifestRaw = readFileSync(manifestFullPath, 'utf-8')
     if (!isJsonString(manifestRaw)) {
       throw new Error('The manifest.json is not valid.')
@@ -171,8 +171,9 @@ export default function crxHotReloadPlugin(
       })
       //generate manifest.json
       if (manifestFullPath) {
-        this.addWatchFile(manifestFullPath)
+        let manifestRaw = readFileSync(manifestFullPath, 'utf-8')
         let manifestSource = manifestRaw.replaceAll('.ts', '.js')
+        this.addWatchFile(manifestFullPath)
         this.emitFile({
           type: 'asset',
           source: manifestSource,
@@ -182,10 +183,10 @@ export default function crxHotReloadPlugin(
     },
     writeBundle() {
       if (socket) {
-        if (contentScripts.includes(changedFilePath)) {
+        if (contentScripts.includes(changedFilePath) || manifestFullPath === changedFilePath) {
           socket.send('UPDATE_CONTENT')
         }
-        if (backgroundScript === changedFilePath) {
+        if (backgroundScript === changedFilePath || manifestFullPath === changedFilePath) {
           socket.send('UPDATE_SERVICE_WORK')
         }
         console.log(`File change detected : ${changedFilePath}`)
