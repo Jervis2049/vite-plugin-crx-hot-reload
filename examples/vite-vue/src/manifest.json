@@ -21,9 +21,9 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.npmjs.com/*"],
+      "matches": [ "<all_urls>" ],
       "js": ["js/content_scripts/content1.ts"],
-      "css": ["css/test.css"],
+      "css": ["css/test.less"],
       "run_at": "document_start"
     },
     {

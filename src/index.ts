@@ -1,9 +1,10 @@
 import type { Plugin, ResolvedConfig } from 'vite'
 import type { ChromeExtensionManifest, ContentScript } from './manifest'
 import { WebSocketServer } from 'ws'
-import { resolve, dirname, extname, basename, normalize } from 'path'
+import { resolve, dirname, extname, basename } from 'path'
 import { readFileSync } from 'fs'
-import { isJsonString, normalizePath } from './utils'
+import { normalizePath } from './utils'
+import { ManifestProcessor } from './processors/manifest'
 
 interface Options {
   port?: number
@@ -31,17 +32,14 @@ export default function crxHotReloadPlugin(
   let contentScripts: string[] = []
   let manifestFullPath: string | undefined
   let assetPaths: string[] = []
+  let cssPaths: string[] = []
   let changedFilePath: string
-  let manifestRaw: string
+  let globalOptions = { port, input }
+  let manifestProcessor
 
   function handleManifest(config) {
     let rollupOptionsInput = config.build.rollupOptions.input
-    manifestFullPath = normalizePath(resolve(config.root, input))
-    manifestRaw = readFileSync(manifestFullPath, 'utf-8')
-    if (!isJsonString(manifestRaw)) {
-      throw new Error('The manifest.json is not valid.')
-    }
-    let manifestContent: ChromeExtensionManifest = JSON.parse(manifestRaw)
+    let manifestContent = manifestProcessor.readManifest()
     let serviceWorker = manifestContent?.background?.service_worker
     if (serviceWorker) {
       backgroundScript = normalizePath(resolve(srcDir, serviceWorker))
@@ -66,6 +64,10 @@ export default function crxHotReloadPlugin(
           contentScripts = [...contentScripts, ...contentScriptFullPaths]
         }
         if (Array.isArray(item.css)) {
+          let cssFullPaths = item.css.map((path) =>
+            normalizePath(resolve(srcDir, path))
+          )
+          cssPaths = [...cssPaths, ...cssFullPaths]
           assetPaths = [...assetPaths, ...item.css]
         }
       })
@@ -116,16 +118,14 @@ export default function crxHotReloadPlugin(
   }
 
   function startWebsocket(config) {
-    if (config?.mode == 'production' || process.env.NODE_ENV == 'production') {
+    if (config?.mode === 'production') {
       return
     }
     const wss = new WebSocketServer({ port })
     wss.on('connection', function connection(ws) {
-      console.log('start ws server at port', port)
+      console.log('[webSocket] Client connected.')
+      ws.on('close', () => console.log('[webSocket] Client disconnected.'))
       socket = ws
-    })
-    wss.on('close', function close() {
-      console.log('Client has disconnected.')
     })
   }
 
@@ -133,6 +133,12 @@ export default function crxHotReloadPlugin(
     name: 'vite-plugin-crx-hot-reload',
     enforce: 'pre',
     configResolved(config: ResolvedConfig) {
+      globalOptions = {
+        ...globalOptions,
+        viteConfig: config
+      }
+      manifestProcessor = new ManifestProcessor(globalOptions)
+
       //Parse manifest.json
       handleManifest(config)
 
@@ -149,44 +155,28 @@ export default function crxHotReloadPlugin(
       let data = ''
       if (backgroundScript === id) {
         data = `var PORT=${port};`
-        data += readFileSync(resolve(__dirname, './background.js'), 'utf-8')
-      }
-      if (contentScripts.includes(id)) {
-        data = `var PORT=${port};`
-        data += readFileSync(resolve(__dirname, './content.js'), 'utf-8')
+        data += readFileSync(resolve(__dirname, 'background.js'), 'utf-8')
       }
       return data + code
     },
     buildStart() {
-      //generate icon/css files
-      assetPaths.forEach((path) => {
-        const assetPath = resolve(srcDir, path)
-        this.addWatchFile(assetPath)
-        let content = readFileSync(assetPath)
-        this.emitFile({
-          type: 'asset',
-          source: content,
-          fileName: normalize(path)
-        })
-      })
-      //generate manifest.json
-      if (manifestFullPath) {
-        let manifestRaw = readFileSync(manifestFullPath, 'utf-8')
-        let manifestSource = manifestRaw.replaceAll('.ts', '.js')
-        this.addWatchFile(manifestFullPath)
-        this.emitFile({
-          type: 'asset',
-          source: manifestSource,
-          fileName: 'manifest.json'
-        })
-      }
+      manifestProcessor.emitManifest(this)
+      manifestProcessor.emitAssets(this, assetPaths)
+      manifestProcessor.emitContentScriptDev(this)
     },
     writeBundle() {
       if (socket) {
-        if (contentScripts.includes(changedFilePath) || manifestFullPath === changedFilePath) {
+        if (
+          contentScripts.includes(changedFilePath) ||
+          cssPaths.includes(changedFilePath) ||
+          manifestFullPath === changedFilePath
+        ) {
           socket.send('UPDATE_CONTENT')
         }
-        if (backgroundScript === changedFilePath || manifestFullPath === changedFilePath) {
+        if (
+          backgroundScript === changedFilePath ||
+          manifestFullPath === changedFilePath
+        ) {
           socket.send('UPDATE_SERVICE_WORK')
         }
         console.log(`File change detected : ${changedFilePath}`)

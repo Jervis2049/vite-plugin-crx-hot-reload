@@ -1,7 +1,7 @@
 const ws = new WebSocket(`ws://localhost:${PORT}`)
 
 ws.onopen = function () {
-  console.log('Connection open ...')
+  console.log('[open] Connection established')
 }
 ws.onmessage = function (e) {
   console.log('Received Message: ' + e.data)
@@ -12,5 +12,5 @@ ws.onmessage = function (e) {
   }
 }
 ws.onclose = function () {
-  console.log('Connection closed.')
+  console.log('[close] Connection closed.')
 }

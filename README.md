@@ -1,8 +1,5 @@
-
-## 
-## Workflow
-
-![workflow.png](https://raw.githubusercontent.com/Jervis2049/vite-plugin-crx-hot-reload/main/docs/workflow.png)
+## Introduce
+This is a vite plugin for generating templates for Chrome extension projects and comes with the ability to automatically refresh files when they are modified.
 
 ## Install
 
