@@ -14,8 +14,9 @@
       "128": "icons/icon128.png"
     },
     "default_title": "Hello World",
-    "default_popup": "popup.html"
+    "default_popup": "../popup.html"
   },
+  "options_page": "../options.html",
   "background": {
     "service_worker": "js/background.ts"
   },

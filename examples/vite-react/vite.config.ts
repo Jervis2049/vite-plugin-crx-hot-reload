@@ -10,12 +10,7 @@ const pathResolve = (p) => {
 export default ({mode})=>{
   return defineConfig({
     build: {
-      emptyOutDir: mode == 'production',
-      rollupOptions: {
-        input: {
-          popup: './popup.html'
-        },
-      }
+      emptyOutDir: mode == 'production'
     },
     resolve: {
         alias: {

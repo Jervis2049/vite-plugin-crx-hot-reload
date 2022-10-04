@@ -1,4 +1,4 @@
 {
-  "watch": ["./dist"],
+  "watch": ["./dist", "./examples/vite-vue/vite.config.ts"],
   "exec": "cd examples/vite-vue && pnpm run dev"
 }

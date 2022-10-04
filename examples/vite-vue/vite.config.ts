@@ -24,22 +24,9 @@ export default ({ mode }) => {
       build: {
         emptyOutDir: mode == 'production',
         rollupOptions: {
-          input: ['./popup.html', './options.html', './src/js/content_scripts/content3.ts'],
+          input: ['./src/js/content_scripts/content3.ts'],
         },  
       },
-      css: {
-        modules: false,
-        preprocessorOptions: {
-          less: {
-            modifyVars: {
-              hack: `true; @import (reference) "${pathResolve(
-                './src/popup/assets/less/variables.less'
-              )}";`
-            },
-            javascriptEnabled: true
-          }
-        }
-      }
     })
 }
 

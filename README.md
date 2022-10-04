@@ -1,5 +1,5 @@
 ## Introduce
-This is a vite plugin for generating templates for Chrome extension projects and comes with the ability to automatically refresh files when they are modified.
+This is a vite plugin that helps Chrome extensions to refresh automatically when files are modified in development.
 
 ## Install
 

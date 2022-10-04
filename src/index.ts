@@ -1,5 +1,4 @@
 import type { Plugin, ResolvedConfig } from 'vite'
-import type { ChromeExtensionManifest, ContentScript } from './manifest'
 import { WebSocketServer } from 'ws'
 import { resolve, dirname, extname, basename } from 'path'
 import { readFileSync } from 'fs'
@@ -25,62 +24,39 @@ export default function crxHotReloadPlugin(
     )
   }
 
-  const srcDir = dirname(input)
+  const srcDir = dirname(input)  
   let socket: any
-  let scriptPaths: string[] = []
-  let backgroundScript: string | undefined
-  let contentScripts: string[] = []
+  let serviceWorkerPath: string | undefined
+  let contentScriptPaths: string[] = []
   let manifestFullPath: string | undefined
   let assetPaths: string[] = []
   let cssPaths: string[] = []
+  let htmlPaths : string[] = []
   let changedFilePath: string
-  let globalOptions = { port, input }
   let manifestProcessor
 
-  function handleManifest(config) {
+  function takeManifestScriptsAsInput(config) {
     let rollupOptionsInput = config.build.rollupOptions.input
-    let manifestContent = manifestProcessor.readManifest()
-    let serviceWorker = manifestContent?.background?.service_worker
-    if (serviceWorker) {
-      backgroundScript = normalizePath(resolve(srcDir, serviceWorker))
-      scriptPaths.push(backgroundScript)
-    }
-    if (manifestContent.icons) {
-      const icons = Object.keys(manifestContent.icons)
-      if (Array.isArray(icons)) {
-        let iconPaths = icons.map((key) => {
-          return manifestContent.icons?.[key]
-        })
-        assetPaths = [...assetPaths, ...iconPaths]
-      }
-    }
-    if (Array.isArray(manifestContent.content_scripts)) {
-      manifestContent.content_scripts.forEach((item: ContentScript) => {
-        if (Array.isArray(item.js)) {
-          let contentScriptFullPaths = item.js.map((path) =>
-            normalizePath(resolve(srcDir, path))
-          )
-          scriptPaths = [...scriptPaths, ...contentScriptFullPaths]
-          contentScripts = [...contentScripts, ...contentScriptFullPaths]
-        }
-        if (Array.isArray(item.css)) {
-          let cssFullPaths = item.css.map((path) =>
-            normalizePath(resolve(srcDir, path))
-          )
-          cssPaths = [...cssPaths, ...cssFullPaths]
-          assetPaths = [...assetPaths, ...item.css]
-        }
-      })
-    }
-
-    // Add background.js and content_scripts as part of rollupOptions.input
+    const  manifestAssetPaths =  manifestProcessor.getAssetPaths()
+    contentScriptPaths = manifestAssetPaths.contentScriptPaths
+    assetPaths = manifestAssetPaths.assetPaths
+    cssPaths = manifestAssetPaths.cssPaths
+    serviceWorkerPath = manifestAssetPaths.serviceWorkerPath
+    htmlPaths = manifestAssetPaths.htmlPaths
+    
     if (Array.isArray(rollupOptionsInput)) {
-      config.build.rollupOptions.input = [...rollupOptionsInput, ...scriptPaths]
+      config.build.rollupOptions.input = [...rollupOptionsInput, ...htmlPaths, ...contentScriptPaths, serviceWorkerPath]
     } else if (typeof rollupOptionsInput === 'object') {
       const entryRet = {}
-      scriptPaths.forEach((item) => {
+      const setEntry = (item)=>{
         const name = basename(item, extname(item))
         entryRet[name] = item
+      }
+      if(serviceWorkerPath) {
+        setEntry(serviceWorkerPath)
+      }
+      [...htmlPaths, ...contentScriptPaths].forEach((item) => {
+        setEntry(item)
       })
       config.build.rollupOptions.input = {
         ...rollupOptionsInput,
@@ -94,7 +70,7 @@ export default function crxHotReloadPlugin(
       config.build.rollupOptions.output = {}
     }
     const entryFileNames = config.build.rollupOptions.output.entryFileNames
-    config.build.rollupOptions.output.entryFileNames = (assetInfo) => {
+    config.build.rollupOptions.output.entryFileNames = (assetInfo) => {      
       if (
         assetInfo.facadeModuleId &&
         /.(j|t)s$/.test(assetInfo.facadeModuleId)
@@ -118,9 +94,7 @@ export default function crxHotReloadPlugin(
   }
 
   function startWebsocket(config) {
-    if (config?.mode === 'production') {
-      return
-    }
+    if (config.mode === 'production') return
     const wss = new WebSocketServer({ port })
     wss.on('connection', function connection(ws) {
       console.log('[webSocket] Client connected.')
@@ -133,27 +107,25 @@ export default function crxHotReloadPlugin(
     name: 'vite-plugin-crx-hot-reload',
     enforce: 'pre',
     configResolved(config: ResolvedConfig) {
-      globalOptions = {
-        ...globalOptions,
+      manifestProcessor = new ManifestProcessor({
+        input,
+        port,
         viteConfig: config
-      }
-      manifestProcessor = new ManifestProcessor(globalOptions)
-
-      //Parse manifest.json
-      handleManifest(config)
-
-      //Rewrite output.entryFileNames to modify build path of assets.
+      })
+      manifestFullPath = normalizePath(resolve(config.root, input))
+      // Add background.js and content_scripts as part of rollupOptions.input
+      takeManifestScriptsAsInput(config)
+      // Rewrite output.entryFileNames to modify build path of assets.
       handleBuildPath(config)
-
       // Open socket service
       startWebsocket(config)
     },
     watchChange(id) {
       changedFilePath = normalizePath(id)
     },
-    transform(code, id) {
+    transform(code, id) {      
       let data = ''
-      if (backgroundScript === id) {
+      if (serviceWorkerPath === id) {
         data = `var PORT=${port};`
         data += readFileSync(resolve(__dirname, 'background.js'), 'utf-8')
       }
@@ -167,14 +139,14 @@ export default function crxHotReloadPlugin(
     writeBundle() {
       if (socket) {
         if (
-          contentScripts.includes(changedFilePath) ||
+          contentScriptPaths.includes(changedFilePath) ||
           cssPaths.includes(changedFilePath) ||
           manifestFullPath === changedFilePath
         ) {
           socket.send('UPDATE_CONTENT')
         }
         if (
-          backgroundScript === changedFilePath ||
+          serviceWorkerPath === changedFilePath ||
           manifestFullPath === changedFilePath
         ) {
           socket.send('UPDATE_SERVICE_WORK')

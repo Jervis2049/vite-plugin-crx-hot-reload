@@ -1,4 +1,3 @@
-import exp from 'constants'
 import os from 'os'
 import path from 'path'
 
