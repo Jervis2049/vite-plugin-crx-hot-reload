@@ -16,7 +16,6 @@ export class ManifestProcessor {
   public contentScriptPaths: string[] = [] //content_scripts
   public assetPaths: string[] = [] // css & icons
   public cssPaths: string[] = [] // css
-  public htmlPaths: string[] = [] // popup.html & options.html
   public srcDir: string
 
   constructor(private options = {} as Options) {
@@ -49,12 +48,6 @@ export class ManifestProcessor {
         resolve(this.srcDir, serviceWorkerPath)
       )
     }
-    if (manifestContent.action?.default_popup) {
-      this.htmlPaths.push(manifestContent.action.default_popup)
-    }
-    if (manifestContent.options_page) {
-      this.htmlPaths.push(manifestContent.options_page)
-    }
     if (manifestContent.icons) {
       const icons = Object.keys(manifestContent.icons)
       if (Array.isArray(icons)) {
@@ -86,7 +79,6 @@ export class ManifestProcessor {
       contentScriptPaths: this.contentScriptPaths,
       assetPaths: this.assetPaths,
       cssPaths: this.cssPaths,
-      htmlPaths: this.normalizeAbsolutePath(this.htmlPaths)
     }
   }
 

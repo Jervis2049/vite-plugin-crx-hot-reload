@@ -29,7 +29,6 @@ export default function crxHotReloadPlugin(
   let contentScriptPaths: string[] = []
   let manifestFullPath: string | undefined
   let cssPaths: string[] = []
-  let htmlPaths: string[] = []
   let changedFilePath: string
   let manifestProcessor
 
@@ -39,12 +38,10 @@ export default function crxHotReloadPlugin(
     contentScriptPaths = manifestAssetPaths.contentScriptPaths
     cssPaths = manifestAssetPaths.cssPaths
     serviceWorkerPath = manifestAssetPaths.serviceWorkerPath
-    htmlPaths = manifestAssetPaths.htmlPaths
 
     if (Array.isArray(rollupOptionsInput)) {
       config.build.rollupOptions.input = [
         ...rollupOptionsInput,
-        ...htmlPaths,
         ...contentScriptPaths,
         serviceWorkerPath
       ]
@@ -57,7 +54,7 @@ export default function crxHotReloadPlugin(
       if (serviceWorkerPath) {
         setEntry(serviceWorkerPath)
       }
-      ;[...htmlPaths, ...contentScriptPaths].forEach((item) => {
+      [ ...contentScriptPaths].forEach((item) => {
         setEntry(item)
       })
       config.build.rollupOptions.input = {

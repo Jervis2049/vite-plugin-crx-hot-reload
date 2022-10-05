@@ -24,7 +24,7 @@ export default ({ mode }) => {
       build: {
         emptyOutDir: mode == 'production',
         rollupOptions: {
-          input: ['./src/js/content_scripts/content3.ts'],
+          input: ['./popup.html', './options.html', './src/js/content_scripts/content3.ts'],
         },  
       },
     })
