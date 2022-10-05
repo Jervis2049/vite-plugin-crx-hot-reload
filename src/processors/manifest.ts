@@ -90,6 +90,23 @@ export class ManifestProcessor {
     }
   }
 
+  public transform(code, id) {
+    let data = ''
+    if (this.serviceWorkerPath === id) {
+      data = `var PORT=${this.options.port};`
+      data += readFileSync(resolve(__dirname, 'background.js'), 'utf-8')
+    }
+    if (code.indexOf('chrome.scripting.executeScript') > 0) {
+      code = code.replace(
+        /(?<=chrome.scripting.executeScript\()[\s\S]*?(?=\))/gm,
+        function (fileStr) {
+          return replaceExtname(fileStr, '.ts', '.js')
+        }
+      )
+    }
+    return data + code
+  }
+
   //generate manifest.json
   public emitManifest(context) {
     let { input, viteConfig } = this.options
@@ -170,8 +187,8 @@ export class ManifestProcessor {
   }
 
   // icon & css
-  public emitAssets(context, paths) {
-    paths.forEach((path) => {
+  public emitAssets(context) {
+    this.assetPaths.forEach((path) => {
       const assetPath = resolve(this.srcDir, path)
       context.addWatchFile(assetPath)
       if (assetPath.endsWith('.less')) {

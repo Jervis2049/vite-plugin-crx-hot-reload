@@ -1,7 +1,6 @@
 import type { Plugin, ResolvedConfig } from 'vite'
 import { WebSocketServer } from 'ws'
 import { resolve, dirname, extname, basename } from 'path'
-import { readFileSync } from 'fs'
 import { normalizePath } from './utils'
 import { ManifestProcessor } from './processors/manifest'
 
@@ -24,38 +23,41 @@ export default function crxHotReloadPlugin(
     )
   }
 
-  const srcDir = dirname(input)  
+  const srcDir = dirname(input)
   let socket: any
   let serviceWorkerPath: string | undefined
   let contentScriptPaths: string[] = []
   let manifestFullPath: string | undefined
-  let assetPaths: string[] = []
   let cssPaths: string[] = []
-  let htmlPaths : string[] = []
+  let htmlPaths: string[] = []
   let changedFilePath: string
   let manifestProcessor
 
   function takeManifestScriptsAsInput(config) {
     let rollupOptionsInput = config.build.rollupOptions.input
-    const  manifestAssetPaths =  manifestProcessor.getAssetPaths()
+    const manifestAssetPaths = manifestProcessor.getAssetPaths()
     contentScriptPaths = manifestAssetPaths.contentScriptPaths
-    assetPaths = manifestAssetPaths.assetPaths
     cssPaths = manifestAssetPaths.cssPaths
     serviceWorkerPath = manifestAssetPaths.serviceWorkerPath
     htmlPaths = manifestAssetPaths.htmlPaths
-    
+
     if (Array.isArray(rollupOptionsInput)) {
-      config.build.rollupOptions.input = [...rollupOptionsInput, ...htmlPaths, ...contentScriptPaths, serviceWorkerPath]
+      config.build.rollupOptions.input = [
+        ...rollupOptionsInput,
+        ...htmlPaths,
+        ...contentScriptPaths,
+        serviceWorkerPath
+      ]
     } else if (typeof rollupOptionsInput === 'object') {
       const entryRet = {}
-      const setEntry = (item)=>{
+      const setEntry = (item) => {
         const name = basename(item, extname(item))
         entryRet[name] = item
       }
-      if(serviceWorkerPath) {
+      if (serviceWorkerPath) {
         setEntry(serviceWorkerPath)
       }
-      [...htmlPaths, ...contentScriptPaths].forEach((item) => {
+      ;[...htmlPaths, ...contentScriptPaths].forEach((item) => {
         setEntry(item)
       })
       config.build.rollupOptions.input = {
@@ -70,7 +72,7 @@ export default function crxHotReloadPlugin(
       config.build.rollupOptions.output = {}
     }
     const entryFileNames = config.build.rollupOptions.output.entryFileNames
-    config.build.rollupOptions.output.entryFileNames = (assetInfo) => {      
+    config.build.rollupOptions.output.entryFileNames = (assetInfo) => {
       if (
         assetInfo.facadeModuleId &&
         /.(j|t)s$/.test(assetInfo.facadeModuleId)
@@ -123,17 +125,12 @@ export default function crxHotReloadPlugin(
     watchChange(id) {
       changedFilePath = normalizePath(id)
     },
-    transform(code, id) {      
-      let data = ''
-      if (serviceWorkerPath === id) {
-        data = `var PORT=${port};`
-        data += readFileSync(resolve(__dirname, 'background.js'), 'utf-8')
-      }
-      return data + code
+    transform(code, id) {
+      return manifestProcessor.transform(code, id)
     },
     buildStart() {
       manifestProcessor.emitManifest(this)
-      manifestProcessor.emitAssets(this, assetPaths)
+      manifestProcessor.emitAssets(this)
       manifestProcessor.emitContentScriptDev(this)
     },
     writeBundle() {
