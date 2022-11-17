@@ -1,3 +1,10 @@
+
+## Tips
+
+This project is no longer maintained, please follow [vite-plugin-crx-mv3](https://github.com/Jervis2049/vite-plugin-crx-mv3).
+
+***
+
 ## Introduce
 This is a vite plugin that helps Chrome extensions to refresh automatically when files are modified in development.
 
